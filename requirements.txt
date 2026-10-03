@@ -1,3 +1,5 @@
 requests>=2.31
 gspread>=6.0
 google-auth>=2.29
+tzdata>=2024.1; sys_platform == 'win32'
+python-dotenv>=1.0
