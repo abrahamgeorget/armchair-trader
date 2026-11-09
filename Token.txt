@@ -1,1 +1,1 @@
-b6xY6u4xOBQ0NIVKP6mwClbFsWq-GQFn0
+--- bring your own API for daily stock prices [date	ticker	open	high	low	close	volume]
