@@ -6,7 +6,7 @@ be run manually each day for now (`python run_daily_v2.py`);
 Supports two markets from the same codebase -- TSX (default) and
 NASDAQ -- switched with one environment variable, `MARKET`. See
 "Switching markets" below.
-
+Note: This is not investment advice , but a prediction project
 ## One-time setup
 
 ### 1. Google service account (so a script can write to Sheets without your login)
