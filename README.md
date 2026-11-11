@@ -130,7 +130,7 @@ good-enough-for-screening, not as authoritative as the TSX one.
 ## Running it
 
 ```bash
-python run_daily.py
+python run_daily_v2.py
 ```
 
 Expected output:
@@ -143,6 +143,31 @@ Done.
 
 Check your Sheet -- you should see two tabs populated with a row per
 symbol per trading day in the lookback window.
+
+## Running skills
+
+Refer to the skill_trade zip file for the 3 Claude skills that drive the daily screen. 
+
+| `qsx-stock-aggresive` | Scores the TSX universe with screen v2, verifies a fresh company catalyst for each name, and writes the shortlist to the `List_agg` tab. |
+| `qsx-nasdaq-aggressive` | Does the same for Nasdaq (USD, ONEQ index proxy) and writes to the `List_agg_NASDAQ` tab. |
+| `cautious-trader-verdict` | Stress-tests a shortlisted pick against hard vetoes and a 10-point scorecard, and returns BUY, BUY-HALF or NO-BUY. |
+
+### How to run
+
+Prerequisite: finish `SETUP.md`, then pull prices with `python run_daily.py` (set `MARKET=NASDAQ` first for Nasdaq).
+
+**1. Screen a market** (`qsx-stock-aggresive` for TSX, `qsx-nasdaq-aggressive` for Nasdaq)
+1. Set the market: leave `MARKET` unset or `TSX`, or `set MARKET=NASDAQ`. Check that the first line of output reads `Market: TSX [screen v2]` or `Market: NASDAQ [screen v2]`.
+2. Ask Claude to run the skill, e.g. `/qsx-stock-aggresive`. It runs `python run_qsx_aggresive.py`, which scores the universe and applies the hard gates (score, ATR range, signal-day rule).
+3. Claude checks each candidate for a catalyst dated within the last 3 trading days, drops names without one, and writes the final CSV.
+4. Claude runs `python write_list_agg.py <final csv>`, which validates every row and appends to the results sheet. A write only counts as done if the script prints "Appended".
+5. Read the report: shortlist with catalysts, regime line (size down if the index is below its 10-day average), and the trailing hit rate of the last 20 picks.
+
+**2. Get a verdict on a pick** (`cautious-trader-verdict`, optional)
+1. Give Claude the ticker with its thesis, entry, stop and ATR%, e.g. `/cautious-trader-verdict` plus a row from the shortlist.
+2. Claude researches the name, checks the seven vetoes, scores the five factors out of 10, and returns BUY (8-10), BUY-HALF (5-7) or NO-BUY (0-4) with sources.
+
+
 
 ## Weekly cleanup: sheet retention
 
