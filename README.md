@@ -1,10 +1,7 @@
-# questrade-sheets
+# armchair-trader
 
-Pulls daily OHLCV data from the Questrade API for an index proxy and a
-watchlist of tickers, and appends it to tabs in a Google Sheet. Meant to
-be run manually each day for now (`python run_daily.py`); can be put on
-a schedule (cron / Task Scheduler / GitHub Actions) later without code
-changes.
+The goal of this project is to identify stocks with 3-5% gains in a week based on price trends in the last few months and publicly available data. It pulls daily OHLCV data from your brokerage account API for an index proxy and a watchlist of tickers, and appends it to tabs in a Google Sheet. Meant to
+be run manually each day for now (`python run_daily_v2.py`);
 
 Supports two markets from the same codebase -- TSX (default) and
 NASDAQ -- switched with one environment variable, `MARKET`. See
@@ -39,7 +36,7 @@ account needs step 5 (share as Editor) done on **both**:
   If `write_list_agg.py` fails with a permission error, this sheet not
   being shared with the service account is the first thing to check.
 
-### 2. Questrade token
+### 2. Brokerage token
 
 You already activated API access and have a token. Seed the local token
 store with it (this file is gitignored):
@@ -110,7 +107,7 @@ Run the daily pull for Nasdaq the same way as TSX, just with the env var
 set first:
 ```bash
 set MARKET=NASDAQ
-python run_daily.py
+python run_daily_v2.py
 ```
 
 And the aggressive screen (see the `qsx-nasdaq-aggressive` Claude Code
@@ -129,14 +126,6 @@ Nasdaq tickers were matched against a third-party GICS-labeled dataset
 (`DSG`, `TRMD.A`, `PSQL`) were filled in individually. Treat it as
 good-enough-for-screening, not as authoritative as the TSX one.
 
-**Also unverified:** the TSX-specific symbol-naming logic in
-`questrade_client.py` (`.TO` suffix querying, preferred-share/debenture
-exclusion) is switched off for Nasdaq rather than applied blindly, since
-US securities use different naming conventions that haven't been
-empirically checked against Questrade's actual symbol table yet. If a
-Nasdaq run logs unexpected `WARN: no symbolId found` for names you'd
-expect to resolve, that's the signal to diagnose (the same way the TSX
-preferred-share bugs were found) rather than assume it's already handled.
 
 ## Running it
 
@@ -157,7 +146,7 @@ symbol per trading day in the lookback window.
 
 ## Weekly cleanup: sheet retention
 
-`cleanup_list_agg.py` trims two unrelated sources of unbounded growth in
+`cleanup_list_agg_v2.py` trims two unrelated sources of unbounded growth in
 one weekly run:
 
 - **`List_agg` / `List_agg_NASDAQ`.** Every run of `/qtrade-daily-tsx`,
@@ -182,49 +171,15 @@ one weekly run:
 
 Run it manually any time with:
 ```bash
-python cleanup_list_agg.py
+python cleanup_list_agg_v2.py
 ```
-
-**Scheduled weekly via Windows Task Scheduler** (so it runs even with no
-chat session open), using the included `cleanup_weekly.bat` wrapper.
-One-time setup, in `cmd.exe`:
-```cmd
-schtasks /create /tn "Qtrade Weekly Sheet Cleanup" /tr "C:\Users\abrah\OneDrive\Documents\Trading\Qtrade\cleanup_weekly.bat" /sc weekly /d SUN /st 20:00
-```
-This creates a task named "Qtrade Weekly Sheet Cleanup" that runs
-every Sunday at 8:00 PM under your Windows login. Output (including any
-errors) is appended to `cleanup_log.txt` in this folder, so you can
-spot-check it after the first couple of runs. Adjust `/d` (day) or `/st`
-(time) to taste, or change `LIST_AGG_RETENTION_DAYS` / `OHLCV_RETENTION_DAYS`
-at the top of `cleanup_list_agg.py` if 8 weeks / 90 days aren't the right
-windows later.
-
-To verify it's registered: `schtasks /query /tn "Qtrade Weekly Sheet Cleanup"`.
-To remove it: `schtasks /delete /tn "Qtrade Weekly Sheet Cleanup" /f`.
-
-## Known simplifications (v1)
-
-- **No dedup.** Rerunning the same day appends duplicate rows for that
-  date. Fine for a manual daily run where you run it once; if you
-  automate this on a schedule, add a "delete existing rows for today's
-  date before appending" step in `sheets_writer.py`. Note this is
-  separate from the weekly retention trim (`cleanup_list_agg.py`) --
-  that removes rows *older* than its window, it doesn't dedup rows
-  *within* the window.
-- **Index proxy, not the raw index.** Questrade's API is account/security
-  oriented, so `INDEX_PROXY_TICKER` (default `XIC` for TSX, `ONEQ` for
-  Nasdaq) stands in for the Composite. Swap it via the `INDEX_PROXY_TICKER`
-  env var if you'd rather track a different proxy (e.g. `QQQ` instead of
-  `ONEQ`).
-- **Fixed 10-day lookback.** `QT_LOOKBACK_DAYS` (default 10) -- bump this
-  if you want a longer history per run (e.g. for a one-time backfill).
 
 ## Troubleshooting
 
 **`AUTH FAILED: Token refresh failed (400): ...`**
-Your stored refresh token is stale, expired (7 days unused), or was
+Your stored refresh token is stale, expired (eg: 7 days unused), or was
 already consumed by another run. Generate a new manual authorization
-token in the Questrade API Centre and reseed `token_store.json` as in
+token in the Brokerage API Centre and reseed `token_store.json` as in
 step 2 above.
 
 **`WARN: no symbolId found for X`**
