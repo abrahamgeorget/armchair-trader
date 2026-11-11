@@ -1,6 +1,6 @@
 # armchair-trader
 
-The goal of this project is to identify stocks with 3-5% gains in a week based on price trends in the last few months and publicly available data. It pulls daily OHLCV data from your brokerage account API for an index proxy and a watchlist of tickers after a trading hours, and appends it to tabs in a Google Sheet. Meant to be run manually each day for now (`python run_daily_v2.py`). The buy predictions for stocks are meant to be executed at market open rate on the next trading day.
+The goal of this project is to identify stocks with 3-5% gains in a week based on price trends in the last few months and publicly available data. It pulls daily OHLCV data from your brokerage account API for an index proxy and a watchlist of tickers after trading hours, and appends it to tabs in a Google Sheet. Meant to be run manually each day for now (`python run_daily_v2.py`). The buy predictions for stocks are meant to be executed at market open price on the next trading day.
 
 Supports two markets from the same codebase -- TSX (default) and
 NASDAQ -- switched with one environment variable, `MARKET`. See
