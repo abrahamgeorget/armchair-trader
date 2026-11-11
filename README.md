@@ -27,7 +27,7 @@ Note: This is not investment advice , but a prediction project
 There are **two separate spreadsheets** in this setup, and the service
 account needs step 5 (share as Editor) done on **both**:
 - `GOOGLE_SHEET_ID` -- the raw daily OHLCV pull (`Index_Daily*` /
-  `Universe_OHLCV*` tabs), written by `run_daily.py`.
+  `Universe_OHLCV*` tabs), written by `run_daily_v2.py`.
 - `GOOGLE_OUTPUT_SHEET_ID` -- Abe's results-tracking sheet, where the
   aggressive screens' final shortlist gets written (`List_agg` for TSX,
   `List_agg_NASDAQ` for Nasdaq -- same sheet, separate tabs so the two
@@ -45,7 +45,7 @@ store with it (this file is gitignored):
 echo '{"refresh_token": "PASTE_YOUR_CURRENT_REFRESH_TOKEN"}' > token_store.json
 ```
 
-Note: the first time `run_daily.py` runs, it will immediately redeem this
+Note: the first time `run_daily_v2.py` runs, it will immediately redeem this
 token and overwrite `token_store.json` with a new one. That's expected --
 Questrade refresh tokens are single-use. Don't hand-edit this file after
 that; let the script manage it.
