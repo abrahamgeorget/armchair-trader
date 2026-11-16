@@ -7,6 +7,9 @@ NASDAQ -- switched with one environment variable, `MARKET`. See
 "Switching markets" below.
 
 Note: This is not investment advice , but a prediction project
+
+## TL DR
+Consider yourself as a trader in a comfy armchair with a group of agents recommending what to invest in, after the market closes. Every day, the aggressive agents find TSX and NASDAQ stocks that are rising fast, have a fresh news reason for it, and could realistically gain about 5% within a week. The cautious agent reviews these daily recommendations and suggests to buy or skip using higher reasoning models. As a user limit to one pick in a week!
 ## One-time setup
 
 ### 1. Google service account (so a script can write to Sheets without your login)
